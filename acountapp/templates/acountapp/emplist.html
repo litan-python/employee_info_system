@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+{% load static %}
+	<head>
+		<title>emplist</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" type="text/css" href="/static/css/style.css" />
+        <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+        <script type="text/javascript">
+            function query() {
+                var qname = $("#ipt").val();
+                var bigstr = "<tr class='"+"table_header'><td>ID</td><td>Name</td><td>Salary</td><td>Age</td><td>Headpic</td><td>Operation</td></tr>";
+                $.ajax({
+                    type:"POST",
+                    url:"{% url 'acountapp:query' %}",
+                    data:"name="+qname+"&csrfmiddlewaretoken="+"{{ csrf_token }}",
+                    success:function (result) {
+                        for (var i=0;i<result.length;i++){
+                            emp = result[i]
+                            bigstr += "<tr class='"+"row1'><td>"+emp['id']+"</td>"
+                            bigstr += "<td>"+emp['name']+"</td>"
+                            bigstr += "<td>"+emp['salary']+"</td>"
+                            bigstr += "<td>"+emp['age']+"</td>"
+                            bigstr += "<td><img src=/static/"+emp["headpic"]+" width='100px' height='50px'></td>"
+                            bigstr += "<td><a href="+"{% url 'operateapp:delete_logic' %}?id="+emp['id']+">delete emp</a>&nbsp;<a href="+"{% url 'operateapp:update' %}?id="+emp['id']+">update emp</a></td>"
+                        }
+                        $("#tb").html(bigstr)
+                    }
+                })
+            }
+
+        </script>
+	</head>
+    <style>
+        .a{
+            width:20px;
+            height: 20px;
+            border:1px solid #e1e2e3;
+            cursor:pointer;
+            display: inline-block;
+            text-align: center;
+            line-height: 20px;
+            background-color: red;
+        }
+        .b{
+            border:0;
+            width:20px;
+            height: 20px;
+            cursor:pointer;
+            display: inline-block;
+            text-align: center;
+            line-height: 20px;
+        }
+        a{
+            text-decoration:none;
+        }
+    </style>
+	<body>
+		<div id="wrap">
+			<div id="top_content"> 
+				<div id="header">
+					<div id="rightheader">
+						<p>
+							{{ time.date }}
+							<br />
+						</p>
+					</div>
+					<div id="topheader">
+						<h1 id="title">
+							<a href="#">main</a>
+						</h1>
+					</div>
+					<div id="navigation">
+					</div>
+				</div>
+				<div id="content">
+					<p id="whereami">
+					</p>
+					<h1>
+						Welcome!
+					</h1>
+					<table id="tb" class="table">
+						<tr class="table_header">
+							<td>
+								ID
+							</td>
+							<td>
+								Name
+							</td>
+							<td>
+								Salary
+							</td>
+							<td>
+								Age
+							</td>
+                            <td>
+								Headpic
+							</td>
+							<td>
+								Operation
+							</td>
+						</tr>
+                        {% for each in page.object_list %}
+                            <tr class="row1">
+                                <td>
+                                    {{ each.id }}
+                                </td>
+                                <td>
+                                    {{ each.name }}
+                                </td>
+                                <td>
+                                    {{ each.salary }}
+                                </td>
+                                <td>
+                                    {{ each.age }}
+                                </td>
+                                <td>
+                                    <img src="{% static each.headpic.url %}" width="100px" height="50px">
+                                </td>
+                                <td>
+                                    <a href="javascript:void(0)" onclick="del_logic()">delete emp</a>&nbsp;<a href="{% url 'operateapp:update' %}?id={{ each.id }}&&num={{ page.number }}">update emp</a>
+                                </td>
+                                <script type="text/javascript">
+                                     function del_logic() {
+                                        var msg = confirm("删除后不可恢复，您确定删除么？")
+                                        if (msg == true) {
+                                            window.location.href = "{% url 'operateapp:delete_logic' %}?id={{ each.id }}&&num={{ page.number }}"
+                                        }
+                                        else {
+                                            return false
+                                        }
+                                    }1
+                                </script>
+                            </tr>
+                        {% endfor %}
+					</table>
+                    {% if page.has_previous %}
+                        <a href="{% url 'acountapp:main'%}?num={{ page.previous_page_number }}">previous</a>
+                    {% endif %}
+                    {% for page_num in page.paginator.page_range %}
+                        <a href="{% url 'acountapp:main'%}?num={{ page_num }}">
+                            {% if page_num == page.number %}
+                                <span class="a">{{ page_num }}</span>
+                            {% else %}
+                                <span class="b">{{ page_num }}</span>
+                            {% endif %}
+                        </a>
+                    {% endfor %}
+                    {% if page.has_next %}
+                        <a href="{% url 'acountapp:main'%}?num={{ page.next_page_number }}">next</a>
+                    {% endif %}
+                    <br><br>
+					<p>
+						<input type="button" class="button" value="Add Employee" onclick="location='{% url "operateapp:add" %}'"/>
+                        <input type="button" class="button" value="quit" onclick="location='{% url "operateapp:quit" %}'"/>
+                        <input type="text" id="ipt" class="inputgri" name="msg" onkeyup="query()">
+                        <input type="button" id="btn" class="button" value="Query" onclick="query()">
+					</p>
+				</div>
+			</div>
+			<div id="footer">
+				<div id="footer_bg">
+				ABC@126.com
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

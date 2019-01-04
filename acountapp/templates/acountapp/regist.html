@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+{% load static %}
+	<head>
+		<title>regist</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" type="text/css" href="/static/css/style.css" />
+        <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+        <script type="text/javascript">
+            function checkname() {
+                $("#namemsg").html( '<img src="/static/img/5-121204193R0-50.gif" width=25px height=25px />')
+                name = $("#name").val();
+                $.ajax({
+                    type: "GET",
+                    url: "{% url 'acountapp:checkname' %}",
+                    data: "name=" + name,
+                    success: function (msg) {
+                        $("#namemsg").html(msg)
+                    }
+                })
+            }
+            function checkpwd1() {
+                $("#pwdmsg1").html( '<img src="/static/img/5-121204193R0-50.gif" width=25px height=25px />')
+                setTimeout(function () {
+                    pwd1 = $("#pwd1").val();
+                    if (pwd1.length < 6 || pwd1.length > 16){
+                        $("#pwdmsg1").html("<img src='/static/img/error_3.jpg' width='25px' height='25px'>请输入一个6到16位的密码")
+                    }
+                    else {
+                        $("#pwdmsg1").html("<img src='/static/img/right.jpg' width='25px' height='25px'>")
+                    }
+                },1000)
+
+            }
+            function checkpwd2() {
+                $("#pwdmsg2").html('<img src="/static/img/5-121204193R0-50.gif" width=25px height=25px />')
+                setTimeout(function () {
+                    pwd1 = $("#pwd1").val();
+                    pwd2 = $("#pwd2").val();
+                    if (pwd1 == pwd2){
+                        $("#pwdmsg2").html("<img src='/static/img/right.jpg' width='25px' height='25px'>两次输入密码一致")
+                    }else {
+                        $("#pwdmsg2").html("<img src='/static/img/error_3.jpg' width='25px' height='25px'>两次密码输入不一致")
+                    }
+                },1000)
+
+            }
+            function checkcode() {
+                $("#codemsg").html('<img src="/static/img/5-121204193R0-50.gif" width=25px height=25px />')
+                code = $("#code").val();
+                $.ajax({
+                    type:"GET",
+                    url:"{% url 'acountapp:checkcode' %}",
+                    data:"code="+code,
+                    success:function (msg) {
+                        $("#codemsg").html(msg)
+                    }
+                })
+            }
+        </script>
+	</head>
+	<body>
+		<div id="wrap">
+			<div id="top_content">
+					<div id="header">
+						<div id="rightheader">
+							<p>
+								{{ time.date }}
+								<br />
+							</p>
+						</div>
+						<div id="topheader">
+							<h1 id="title">
+								<a href="#">main</a>
+							</h1>
+						</div>
+						<div id="navigation">
+						</div>
+					</div>
+				<div id="content">
+					<p id="whereami">
+					</p>
+					<h1>
+						regist
+					</h1>
+					<form action="{% url 'acountapp:regist_logic' %}" method="post">
+                        {% csrf_token %}
+						<table cellpadding="0" cellspacing="0" border="0"
+							class="form_table">
+							<tr>
+								<td valign="middle" align="right">
+									name:
+								</td>
+								<td valign="middle" align="left">
+									<input type="text" id="name" class="inputgri" name="username" onblur="checkname()"/>
+                                    <span id="namemsg"></span>
+								</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="right">
+									realname:
+								</td>
+								<td valign="middle" align="left">
+									<input type="text" class="inputgri" name="name" />
+								</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="right">
+									password:
+								</td>
+								<td valign="middle" align="left">
+									<input type="password" id="pwd1" class="inputgri" name="pwd" onblur="checkpwd1()"/>
+                                    <span id="pwdmsg1"></span>
+								</td>
+							</tr>
+                            <tr>
+								<td valign="middle" align="right">
+									passwordagain:
+								</td>
+								<td valign="middle" align="left">
+									<input type="password" id="pwd2" class="inputgri" name="pwdagain" onblur="checkpwd2()"/>
+                                    <span id="pwdmsg2"></span>
+								</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="right">
+									sex:
+								</td>
+								<td valign="middle" align="left">
+                                    male
+									<input type="radio" class="inputgri" name="sex" value="男" checked="checked"/>
+									female
+									<input type="radio" class="inputgri" name="sex" value="女"/>
+								</td>
+							</tr>
+							
+							<tr>
+								<td valign="middle" align="right">
+									captcha:
+									<img id="num" src="{% url 'acountapp:getCaptcha' %}" width="80px" height="30px"/>
+									<a href="javascript:void(0)" onclick="document.getElementById('num').src = '{% url "acountapp:getCaptcha" %}?'+(new Date()).getTime()">change</a>
+								</td>
+								<td valign="middle" align="left">
+									<input type="text" id="code" class="inputgri" name="number" onblur="checkcode()"/>
+                                    <span id="codemsg"></span>
+								</td>
+							</tr>
+						</table>
+						<p>
+							<input type="submit" class="button" value="Submit &raquo;"/>
+						</p>
+					</form>
+				</div>
+			</div>
+			<div id="footer">
+				<div id="footer_bg">
+				ABC@126.com
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
